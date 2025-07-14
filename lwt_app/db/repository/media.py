@@ -1,34 +1,59 @@
-from db.repository.base import BaseRepository
-from db.models.media import Media
+from dataclasses import dataclass
 from typing import Sequence
-from sqlalchemy import func, select
 
-from sqlalchemy.orm import joinedload
-from entities.system import Pagination
+from db.repository.base import BaseRepository, Pagination
+from db.models.media import Media
+from sqlalchemy import func, select, Select
+
+from entities.media import MediaType, WatchedEnum
+
+
+@dataclass(kw_only=True, frozen=True, slots=True)
+class MediaFilter:
+    user_id: int | None = None
+    title: str | None = None
+    media_type: MediaType | None = None
+    watched: WatchedEnum = WatchedEnum.ALL
+
+    def apply(self, stmt: Select) -> Select:
+        if self.user_id is not None:
+            stmt = stmt.where(Media.user_id == self.user_id)
+        if self.title is not None:
+            stmt = stmt.where(Media.title.ilike(f"%{self.title}%"))
+        if self.media_type is not None:
+            stmt = stmt.where(Media.media_type == self.media_type)
+        if self.watched is WatchedEnum.UNWATCHED:
+            stmt = stmt.where(Media.watched == False)
+        elif self.watched is WatchedEnum.WATCHED:
+            stmt = stmt.where(Media.watched == True)
+
+        return stmt
 
 
 class MediaRepository(BaseRepository[Media]):
     async def get_by_id(self, media_id: int) -> Media | None:
         return await self.session.get(Media, media_id)
 
-    async def get_count(self, user_id: int) -> int:
+    async def get_count(
+        self,
+        filters: MediaFilter | None = None,
+    ) -> int:
         stmt = select(
             func.count(Media.id)
-        ).where(Media.user_id == user_id)
+        )
+        if filters is not None:
+            stmt = filters.apply(stmt)
+
         return await self.session.scalar(stmt) or 0
 
-    async def get_by_user_id(
+    async def get_user_media(
         self,
-        user_id: int,
+        filters: MediaFilter | None = None,
         pagination: Pagination | None = None
     ) -> Sequence[Media]:
-        stmt = select(
-            Media
-        ).where(
-            Media.user_id == user_id
-        ).options(
-            joinedload(Media.user)
-        )
+        stmt = select(Media)
+        if filters is not None:
+            stmt = filters.apply(stmt)
         if pagination is not None:
             stmt = stmt.offset(
                 pagination.offset
@@ -38,17 +63,9 @@ class MediaRepository(BaseRepository[Media]):
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    # async def get_rows(
-    #     self,
-    # ) -> Sequence[Media]:
-    #     # async def get_user_media(user_id: int, page: int = 1, per_page: int = 3):
-    # async with async_session() as session:
-    #     offset = (page - 1) * per_page
-    #     stmt = (
-    #         select(Media)
-    #         .where(Media.user_id == user_id)
-    #         .offset(offset)
-    #         .limit(per_page)
-    #     result=await session.execute(stmt)
-    #     return result.scalars().all()
-    #     return []
+    async def toggle_watched_status(self, media_id: int) -> None:
+        media = await self.get_by_id(media_id)
+        if media is None:
+            return None
+        media.watched = not media.watched
+        await self.update(media)

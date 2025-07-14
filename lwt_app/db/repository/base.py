@@ -1,11 +1,26 @@
 from types import TracebackType
 from typing import TypeVar, Generic, Self
+from dataclasses import dataclass
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import Select
 from core.database import async_session_factory, BaseModel
 from contextlib import AbstractAsyncContextManager
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
+
+
+@dataclass(kw_only=True, frozen=True, slots=True)
+class Pagination:
+    page: int = 1
+    per_page: int = 3
+
+    @property
+    def offset(self) -> int:
+        return (self.page - 1) * self.per_page
+
+    def apply(self, stmt: Select) -> Select:
+        return stmt.offset(self.offset).limit(self.per_page)
 
 
 class BaseRepository(AbstractAsyncContextManager, Generic[ModelT]):
