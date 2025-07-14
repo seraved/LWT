@@ -90,11 +90,7 @@ def setup_handlers(app: Application):
             States.SHOWING_CHOSE_MEDIA_TYPE: [
                 CallbackQueryHandler(
                     callback=media.get_showing_media_type,
-                    pattern=f"^{kb_val.KEY_ANIME}|{kb_val.KEY_MOVIE}|{kb_val.KEY_SERIES}$",
-                ),
-                CallbackQueryHandler(
-                    callback=media.go_back_to_show_media,
-                    pattern=f"^{kb_val.KEY_RETURN_TO_SELECTION}$",
+                    pattern=f"^{kb_val.KEY_ANIME}|{kb_val.KEY_MOVIE}|{kb_val.KEY_SERIES}|{kb_val.KEY_ALL}$",
                 ),
             ],
             States.SHOW_MEDIA: [

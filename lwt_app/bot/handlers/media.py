@@ -1,6 +1,6 @@
 
 from telegram.ext import ContextTypes
-from telegram import ReplyKeyboardRemove, Update
+from telegram import InlineKeyboardButton, Update
 
 from bot.states import States
 from bot.keyboards import media, base
@@ -28,7 +28,7 @@ async def adding_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     context.user_data["add_media_type"] = None
     await update.message.reply_text(
         text="Что хотим добавить?",
-        reply_markup=media.choosing_media_type(),
+        reply_markup=media.choosing_media_type(for_add=True),
     )
     return States.ADDING_CHOOSE_MEDIA_TYPE
 
@@ -105,7 +105,7 @@ async def go_back_to_add_media(update: Update, context: ContextTypes.DEFAULT_TYP
 
     await update.callback_query.edit_message_text(
         text="Что хотим добавить?",
-        reply_markup=media.choosing_media_type(),
+        reply_markup=media.choosing_media_type(for_add=True),
     )
     return States.ADDING_CHOOSE_MEDIA_TYPE
 
@@ -128,17 +128,13 @@ async def showing_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
 async def get_showing_media_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Сохранение выбранного типа -> ... """
-    logger.info("--==@==-- get_showing_media_type")
     if update.callback_query is None:
         return States.MAIN_MENU
     if context.user_data is None:
         return States.MAIN_MENU
 
-    query_data = update.callback_query.data or "_EMPTY_"
+    query_data = update.callback_query.data or "EMPTY__"
     media_type = MEDIA_TYPE_KEY_MAP.get(query_data, None)
-    if media_type is None:
-        logger.error(f"Unknown media type: {query_data}")
-        return States.MAIN_MENU
 
     context.user_data["show_media_type"] = media_type
 
@@ -186,15 +182,23 @@ async def show_media_list(
             #     [[InlineKeyboardButton("➕ Добавить", callback_data="add_media")]])
         )
         return States.SHOWING_CHOSE_MEDIA_TYPE
+    msg_parts = ["🎬 Ваши записи (стр. {page}/{total_pages}):\n"]
+    keyboard = []
+    for item in media_items:
+        # Добавляем элемент в текст
+        msg_parts.append(item.to_msg())
 
-    items_text = "\n".join(
-        f"{i+1}. {item.title} {'✅' if item.watched else ''}"
-        for i, item in enumerate(media_items)
-    )
+        # Добавляем кнопку для элемента
+        keyboard.append(
+            InlineKeyboardButton(
+                text=f"{item.title}",
+                callback_data=f"edit_item__{item.id}"
+            )
+        )
 
     await update.callback_query.edit_message_text(
-        f"📋 Ваши записи (стр. {page}/{total_pages}):\n\n{items_text}",
-        reply_markup=media.media_list_keyboard(page, total_pages))
+        '\n'.join(msg_parts),
+        reply_markup=media.media_list_keyboard(page, total_pages, parent_layer=keyboard))
     return States.SHOW_MEDIA
 
 
