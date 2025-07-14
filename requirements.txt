@@ -1,0 +1,13 @@
+# CONF
+pydantic-settings==2.10.1
+
+# BOT
+python-telegram-bot==22.2
+
+# DB
+alembic==1.7.7
+psycopg2-binary==2.9.10
+SQLAlchemy==2.0.41
+sqlalchemy[asyncio]
+asyncpg==0.30.0
+
