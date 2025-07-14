@@ -1,5 +1,5 @@
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from .constants import KEY_ANIME_ADD, KEY_MOVIE_ADD, KEY_SERIES_ADD, KEY_MAIN_MENU
+from .constants import KEY_ANIME_ADD, KEY_MOVIE_ADD, KEY_SERIES_ADD, KEY_BACK_TO_ADD_MEDIA
 
 
 def choosing_media_type():
@@ -9,8 +9,16 @@ def choosing_media_type():
             InlineKeyboardButton("📺 Сериал", callback_data=KEY_SERIES_ADD),
             InlineKeyboardButton("🇯🇵 Аниме", callback_data=KEY_ANIME_ADD),
         ],
-        [InlineKeyboardButton("↩️ В меню", callback_data=KEY_MAIN_MENU)]
     ])
+
+
+def back_to_main_menu():
+    return InlineKeyboardMarkup(
+        [
+            [InlineKeyboardButton(
+                "↩️ Назад", callback_data=KEY_BACK_TO_ADD_MEDIA)],
+        ]
+    )
 
 
 def media_list_keyboard(page: int, total_pages: int):

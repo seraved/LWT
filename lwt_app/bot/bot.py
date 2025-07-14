@@ -85,11 +85,15 @@ def setup_handlers(app: Application):
                     filters=filters.TEXT & ~filters.COMMAND,
                     callback=media.save_media,
                 ),
+                CallbackQueryHandler(
+                    callback=media.go_back_to_add_media,
+                    pattern=f"^{kb_val.KEY_BACK_TO_ADD_MEDIA}$",
+                ),
             ],
             # SHOW MEDIA
-            # States.START_SHOW_MEDIA: [
+            States.START_SHOW_MEDIA: [
 
-            # ]
+            ]
 
             # States.START_ADD_MEDIA: [
             #     CallbackQueryHandler(callback=media.button_handler),
@@ -114,7 +118,7 @@ def setup_handlers(app: Application):
         },
         fallbacks=[
             CommandHandler('start', base.start),
-            MessageHandler(filters.ALL, base.back_to_menu)
+            MessageHandler(filters.ALL, base.start)
         ],
     )
 

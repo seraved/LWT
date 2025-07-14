@@ -57,7 +57,7 @@ async def get_media_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     await update.callback_query.edit_message_text(
         msg_text,
-        reply_markup=None,
+        reply_markup=media.back_to_main_menu(),
     )
     return States.SAVE_MEDIA
 
@@ -93,66 +93,42 @@ async def save_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return States.MAIN_MENU
 
 
+async def go_back_to_add_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if context.user_data is None:
+        return States.MAIN_MENU
+    if update.callback_query is None:
+        return States.MAIN_MENU
+
+    context.user_data["media_type"] = None
+
+    await update.callback_query.edit_message_text(
+        text="Что хотим добавить?",
+        reply_markup=media.choosing_media_type(),
+    )
+    return States.CHOOSING_MEDIA_TYPE
+
+
 async def showing_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    return States.MAIN_MENU
     if update.message is None:
         return States.MAIN_MENU
+
+    # TODO FIX THIS MOC
+    user_id = 1
+    user_media_count = await MediaService().get_media_count(user_id=user_id)
+
+    if user_media_count == 0:
+        await update.message.reply_text(
+            text="У Вас еще ничего не добавлено.",
+            # reply_markup=media.(),
+        )
 
     # await update.message.reply_text(
     #     text="Что нужно найти?",
-    #     # reply_markup=media.
-    # elif context.user_data["media_type"] == MediaType.SERIES:
-    #     msg_text = "✅ Сериал добавлен!"
-    # else:
-    #     msg_text = "✅ Аниме добавлено!"
-
-    await update.callback_query.edit_message_text(
-        "Введите название:",
-        reply_markup=None,
-    )
-    return States.SAVE_MEDIA
-
-
-async def save_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message is None:
-        return States.MAIN_MENU
-    if context.user_data is None:
-        return States.MAIN_MENU
-    if (title := getter.get_message_text(update.message)) is None:
-        return States.MAIN_MENU
-
-    # TODO FIX IT MOC
-    user_id = 1
-    await MediaService().add_media(
-        media_data=NewMediaDTO(
-            title=title,
-            media_type=context.user_data["media_type"],
-            user_id=user_id,
-        )
-    )
-    if context.user_data["media_type"] == MediaType.MOVIE:
-        msg_text = "✅ Фильм добавлен!"
-    elif context.user_data["media_type"] == MediaType.SERIES:
-        msg_text = "✅ Сериал добавлен!"
-    else:
-        msg_text = "✅ Аниме добавлено!"
-
-    await update.message.reply_text(
-        msg_text,
-        reply_markup=base.main_menu(),
-    )
-    return States.MAIN_MENU
-
-
-async def showing_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    if update.message is None:
-        return States.MAIN_MENU
-
-    await update.message.reply_text(
-        text="Что нужно найти?",
-        reply_markup=media.media_type_menu(),
-    )
-    await update.message.delete()
-    return States.START_SHOW_MEDIA
+    #     reply_markup=media.media_type_menu(),.
+    # )
+    # await update.message.delete()
+    # return States.START_SHOW_MEDIA
 
 
 # async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
