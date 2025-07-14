@@ -2,7 +2,6 @@ from types import TracebackType
 from typing import TypeVar, Generic, Self
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from core.database import async_session_factory, BaseModel
 from contextlib import AbstractAsyncContextManager
 
