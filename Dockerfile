@@ -45,4 +45,4 @@ COPY --chown=appuser:appgroup . .
 USER appuser
 
 # Команда для запуска приложения
-CMD ["python", "./main.py"]
+CMD ["python", "./lwt_app/main.py"]

@@ -12,4 +12,4 @@ echo "Migrations applied successfully"
 
 # Запуск основной команды контейнера
 echo "Run app"
-python ./main.py
+python ./lwt_app/main.py

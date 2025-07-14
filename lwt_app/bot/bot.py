@@ -1,22 +1,42 @@
-import logging
 
 from telegram.ext import (
     Application,
     CommandHandler,
+    CallbackQueryHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters
 )
-from lwt_app.core.config import settings
+from bot.handlers import start, button_handler, handle_add_media
+from bot.states import States
+
+from core.config import settings
+from utils.logs import logger
 
 
-logger = logging.getLogger(__name__)
+def setup_handlers(app: Application):
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            States.ADD_MEDIA: [
+                MessageHandler(
+                    filters=filters.TEXT & ~filters.COMMAND,
+                    callback=handle_add_media,
+                )
+            ],
+            States.MAIN_MENU: [
+                CallbackQueryHandler(callback=button_handler)
+            ]
+        },
+        fallbacks=[]
+    )
 
-
-async def start(update, context):
-    await update.message.reply_text("🚀 MediaTracker запущен!")
+    app.add_handler(conv_handler)
 
 
 def run_bot():
     app = Application.builder().token(settings.BOT_TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
+    setup_handlers(app)
     app.run_polling()
 
 

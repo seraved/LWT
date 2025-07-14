@@ -1,8 +1,10 @@
 from sqlalchemy import BigInteger
-from sqlalchemy.sql import func, cast, text
 from core.database import BaseModel
-from sqlalchemy.orm import mapped_column, Mapped
-from datetime import datetime, date
+from sqlalchemy.orm import mapped_column, Mapped, relationship
+from typing import List, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .media import Media
 
 
 class User(BaseModel):
@@ -13,3 +15,5 @@ class User(BaseModel):
         primary_key=True,
     )
     username: Mapped[str] = mapped_column(default="")
+
+    media: Mapped[List["Media"]] = relationship(back_populates="user")
