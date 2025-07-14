@@ -37,6 +37,10 @@ def setup_handlers(app: Application):
     #     },
     #     fallbacks=[CommandHandler("cancel", base.back_to_menu)]
     # )
+
+    # /start ==> def start
+    # def start == MSG + KB_auth => START_MENU
+
     lwt_conv_handler = ConversationHandler(
         entry_points=[CommandHandler("start", base.start)],
         states={
@@ -66,18 +70,10 @@ def setup_handlers(app: Application):
                 )
             ],
             # ADD MEDIA
-            States.CHOOSING_MEDIA_TYPE: [
+            States.ADDING_CHOOSE_MEDIA_TYPE: [
                 CallbackQueryHandler(
-                    callback=media.get_media_type,
-                    pattern=f"^{kb_val.KEY_ANIME_ADD}$",
-                ),
-                CallbackQueryHandler(
-                    callback=media.get_media_type,
-                    pattern=f"^{kb_val.KEY_MOVIE_ADD}$",
-                ),
-                CallbackQueryHandler(
-                    callback=media.get_media_type,
-                    pattern=f"^{kb_val.KEY_SERIES_ADD}$",
+                    callback=media.get_adding_media_type,
+                    pattern=f"^{kb_val.KEY_ANIME}|{kb_val.KEY_MOVIE}|{kb_val.KEY_SERIES}$",
                 ),
             ],
             States.SAVE_MEDIA: [
@@ -87,13 +83,27 @@ def setup_handlers(app: Application):
                 ),
                 CallbackQueryHandler(
                     callback=media.go_back_to_add_media,
-                    pattern=f"^{kb_val.KEY_BACK_TO_ADD_MEDIA}$",
+                    pattern=f"^{kb_val.KEY_RETURN_TO_SELECTION}$",
                 ),
             ],
             # SHOW MEDIA
-            States.START_SHOW_MEDIA: [
-
-            ]
+            States.SHOWING_CHOSE_MEDIA_TYPE: [
+                CallbackQueryHandler(
+                    callback=media.get_showing_media_type,
+                    pattern=f"^{kb_val.KEY_ANIME}|{kb_val.KEY_MOVIE}|{kb_val.KEY_SERIES}$",
+                ),
+                CallbackQueryHandler(
+                    callback=media.go_back_to_show_media,
+                    pattern=f"^{kb_val.KEY_RETURN_TO_SELECTION}$",
+                ),
+            ],
+            States.SHOW_MEDIA: [
+                CallbackQueryHandler(media.page_handler, pattern="^page_\d+$"),
+                CallbackQueryHandler(
+                    callback=media.go_back_to_show_media,
+                    pattern=f"^{kb_val.KEY_RETURN_TO_SELECTION}$",
+                ),
+            ],
 
             # States.START_ADD_MEDIA: [
             #     CallbackQueryHandler(callback=media.button_handler),

@@ -5,7 +5,7 @@ SHOW_CONTENT_TEXT = "📋 Мои записи"
 
 
 # InlineKeyboardButton
-KEY_ANIME_ADD = "add_anime__"
-KEY_MOVIE_ADD = "add_movie__"
-KEY_SERIES_ADD = "add_series__"
-KEY_BACK_TO_ADD_MEDIA = "main_menu__"
+KEY_ANIME = "add_anime__"
+KEY_MOVIE = "add_movie__"
+KEY_SERIES = "add_series__"
+KEY_RETURN_TO_SELECTION = "main_menu__"

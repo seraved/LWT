@@ -5,12 +5,12 @@ class States(IntEnum):
     START_MENU = auto()  # Основное меню входа
     MAIN_MENU = auto()  # Основное меню
 
-    CHOOSING_MEDIA_TYPE = auto()
+    ADDING_CHOOSE_MEDIA_TYPE = auto()
     SAVE_MEDIA = auto()
 
-    START_SHOW_MEDIA = auto()
+    SHOWING_CHOSE_MEDIA_TYPE = auto()
+    # START_SHOW_MEDIA = auto()
     SHOW_MEDIA = auto()
-
 
     # SHOW_MEDIA = auto()
     # EDIT_MEDIA = auto()

@@ -1,7 +1,7 @@
 
 from db.models import Media
 from db.repository.media import MediaFilter, MediaRepository, Pagination
-from entities.media import MediaDTO, NewMediaDTO, WatchedEnum
+from entities.media import MediaDTO, NewMediaDTO, WatchedEnum, MediaType
 
 
 class MediaService:
@@ -30,12 +30,14 @@ class MediaService:
     async def get_media_count(
         self,
         user_id: int,
+        media_type: MediaType | None = None,
         watched_filter: str | None = None,
     ) -> int:
         async with self.media_repository() as repo:
             return await repo.get_count(
                 filters=MediaFilter(
                     user_id=user_id,
+                    media_type=media_type,
                     watched=WatchedEnum[watched_filter] if watched_filter else WatchedEnum.ALL
                 )
             )
@@ -44,6 +46,7 @@ class MediaService:
         self,
         user_id: int,
         watched_filter: str | None = None,
+        media_type: MediaType | None = None,
         page: int = 1,
         per_page: int = 3,
     ) -> list[MediaDTO]:
@@ -53,6 +56,7 @@ class MediaService:
         )
         filters = MediaFilter(
             user_id=user_id,
+            media_type=media_type,
             watched=WatchedEnum[watched_filter] if watched_filter else WatchedEnum.ALL
         )
         async with self.media_repository() as repo:

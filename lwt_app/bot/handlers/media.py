@@ -12,9 +12,9 @@ from utils.logs import logger
 from entities.media import MediaType
 
 MEDIA_TYPE_KEY_MAP = {
-    kb_val.KEY_MOVIE_ADD: MediaType.MOVIE,
-    kb_val.KEY_SERIES_ADD: MediaType.SERIES,
-    kb_val.KEY_ANIME_ADD: MediaType.ANIME,
+    kb_val.KEY_MOVIE: MediaType.MOVIE,
+    kb_val.KEY_SERIES: MediaType.SERIES,
+    kb_val.KEY_ANIME: MediaType.ANIME,
 }
 
 
@@ -22,16 +22,18 @@ async def adding_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     """Сообщение-ветка для добавления контента -> Выбор типа"""
     if update.message is None:
         return States.MAIN_MENU
+    if context.user_data is None:
+        return States.MAIN_MENU
 
+    context.user_data["add_media_type"] = None
     await update.message.reply_text(
         text="Что хотим добавить?",
         reply_markup=media.choosing_media_type(),
     )
-    await update.message.delete()
-    return States.CHOOSING_MEDIA_TYPE
+    return States.ADDING_CHOOSE_MEDIA_TYPE
 
 
-async def get_media_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def get_adding_media_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Сохранение выбранного типа -> Получение названия"""
     if update.callback_query is None:
         return States.MAIN_MENU
@@ -44,7 +46,7 @@ async def get_media_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         logger.error(f"Unknown media type: {query_data}")
         return States.MAIN_MENU
 
-    context.user_data["media_type"] = media_type
+    context.user_data["add_media_type"] = media_type
 
     if media_type is MediaType.MOVIE:
         msg_text = "Какой фильм добавляем?"
@@ -75,13 +77,13 @@ async def save_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await MediaService().add_media(
         media_data=NewMediaDTO(
             title=title,
-            media_type=context.user_data["media_type"],
+            media_type=context.user_data["add_media_type"],
             user_id=user_id,
         )
     )
-    if context.user_data["media_type"] == MediaType.MOVIE:
+    if context.user_data["add_media_type"] == MediaType.MOVIE:
         msg_text = "✅ Фильм добавлен!"
-    elif context.user_data["media_type"] == MediaType.SERIES:
+    elif context.user_data["add_media_type"] == MediaType.SERIES:
         msg_text = "✅ Сериал добавлен!"
     else:
         msg_text = "✅ Аниме добавлено!"
@@ -99,36 +101,116 @@ async def go_back_to_add_media(update: Update, context: ContextTypes.DEFAULT_TYP
     if update.callback_query is None:
         return States.MAIN_MENU
 
-    context.user_data["media_type"] = None
+    context.user_data["add_media_type"] = None
 
     await update.callback_query.edit_message_text(
         text="Что хотим добавить?",
         reply_markup=media.choosing_media_type(),
     )
-    return States.CHOOSING_MEDIA_TYPE
+    return States.ADDING_CHOOSE_MEDIA_TYPE
 
 
 async def showing_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    return States.MAIN_MENU
+    """Сообщение-ветка для просмотра контента -> Фильтры"""
     if update.message is None:
         return States.MAIN_MENU
+    if context.user_data is None:
+        return States.MAIN_MENU
 
-    # TODO FIX THIS MOC
+    context.user_data["show_media_type"] = None
+
+    await update.message.reply_text(
+        text="Что хотим посмотреть?",
+        reply_markup=media.choosing_media_type(),
+    )
+    return States.SHOWING_CHOSE_MEDIA_TYPE
+
+
+async def get_showing_media_type(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    """Сохранение выбранного типа -> ... """
+    logger.info("--==@==-- get_showing_media_type")
+    if update.callback_query is None:
+        return States.MAIN_MENU
+    if context.user_data is None:
+        return States.MAIN_MENU
+
+    query_data = update.callback_query.data or "_EMPTY_"
+    media_type = MEDIA_TYPE_KEY_MAP.get(query_data, None)
+    if media_type is None:
+        logger.error(f"Unknown media type: {query_data}")
+        return States.MAIN_MENU
+
+    context.user_data["show_media_type"] = media_type
+
+    await update.callback_query.answer()
+    return await show_media_list(update, context)
+
+# Постраничный вывод
+
+
+async def page_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    page = int(update.callback_query.data.split("_")[1])
+    return await show_media_list(update, context, page)
+
+
+async def show_media_list(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
+    page: int = 1,
+):
+    if update.callback_query is None:
+        return States.MAIN_MENU
+    if context.user_data is None:
+        return States.MAIN_MENU
+
+    # user_id = update.effective_user.id
     user_id = 1
-    user_media_count = await MediaService().get_media_count(user_id=user_id)
+    service = MediaService()
 
-    if user_media_count == 0:
-        await update.message.reply_text(
-            text="У Вас еще ничего не добавлено.",
-            # reply_markup=media.(),
+    media_items = await service.get_user_media(
+        user_id=user_id,
+        media_type=context.user_data.get("show_media_type"),
+        page=page
+    )
+    total_items = await service.get_media_count(
+        user_id=user_id,
+        media_type=context.user_data.get("show_media_type"),
+    )
+    total_pages = (total_items + 2) // 3  # Округляем вверх
+
+    if not media_items:
+        await update.callback_query.edit_message_text(
+            "Ваш список пуст",
+            reply_markup=media.back_to_main_menu()
+            # reply_markup=mediaInlineKeyboardMarkup(
+            #     [[InlineKeyboardButton("➕ Добавить", callback_data="add_media")]])
         )
+        return States.SHOWING_CHOSE_MEDIA_TYPE
 
-    # await update.message.reply_text(
-    #     text="Что нужно найти?",
-    #     reply_markup=media.media_type_menu(),.
-    # )
-    # await update.message.delete()
-    # return States.START_SHOW_MEDIA
+    items_text = "\n".join(
+        f"{i+1}. {item.title} {'✅' if item.watched else ''}"
+        for i, item in enumerate(media_items)
+    )
+
+    await update.callback_query.edit_message_text(
+        f"📋 Ваши записи (стр. {page}/{total_pages}):\n\n{items_text}",
+        reply_markup=media.media_list_keyboard(page, total_pages))
+    return States.SHOW_MEDIA
+
+
+async def go_back_to_show_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if context.user_data is None:
+        return States.MAIN_MENU
+    if update.callback_query is None:
+        return States.MAIN_MENU
+
+    context.user_data["add_media_type"] = None
+
+    await update.callback_query.edit_message_text(
+        text="Что хотим посмотреть?",
+        reply_markup=media.choosing_media_type(),
+    )
+    return States.SHOWING_CHOSE_MEDIA_TYPE
 
 
 # async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -148,32 +230,6 @@ async def showing_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
 
 #     if query.data == "filter_all":
 #         return await show_media_list(update, context, page=1)
-
-
-# async def add_media(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-#     """Обработчик добавления контента"""
-#     if update.message is None:
-#         return States.MAIN_MENU
-
-#     if (user_id := get_user_id(update.message)) is None:
-#         return States.MAIN_MENU
-#     if (title := get_message_text(update.message)) is None:
-#         return States.MAIN_MENU
-
-#     # TODO FIX IT MOC
-#     user_id = 1
-#     await MediaService().add_media(
-#         media_data=MediaDTO(
-#             title=title,
-#             media_type=MediaTypeEnum.MOVIE,
-#             user_id=user_id,
-#         )
-#     )
-#     await update.message.reply_text(
-#         "✅ Запись добавлена!",
-#         reply_markup=base.main_menu(),
-#     )
-#     return States.MAIN_MENU
 
 
 # async def show_media_list(update: Update, context: ContextTypes.DEFAULT_TYPE, page: int = 1, watched_filter: str = None):
