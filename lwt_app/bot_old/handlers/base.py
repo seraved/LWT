@@ -1,9 +1,9 @@
 
 from telegram.ext import ContextTypes, CallbackContext, ConversationHandler
 from telegram import Update
-from bot.states import States
+from bot_old.states import States
 
-from bot.keyboards import base as base_markup
+from bot_old.keyboards import base as base_markup
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):

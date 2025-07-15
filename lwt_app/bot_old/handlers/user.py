@@ -2,8 +2,8 @@
 
 from telegram.ext import ContextTypes
 from telegram import Update
-from bot.states import States
-from bot.keyboards import base
+from bot_old.states import States
+from bot_old.keyboards import base
 
 from utils import getters as getter
 from utils.logs import logger

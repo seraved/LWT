@@ -2,9 +2,9 @@
 from telegram.ext import ContextTypes
 from telegram import InlineKeyboardButton, Update
 
-from bot.states import States
-from bot.keyboards import media, base
-from bot.keyboards import constants as kb_val
+from bot_old.states import States
+from bot_old.keyboards import media, base
+from bot_old.keyboards import constants as kb_val
 from services.media import MediaService
 from entities.media import NewMediaDTO
 from utils import getters as getter

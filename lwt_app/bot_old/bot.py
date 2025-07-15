@@ -7,9 +7,9 @@ from telegram.ext import (
     MessageHandler,
     filters
 )
-from bot.handlers import media, base, user
-from bot.keyboards import constants as kb_val
-from bot.states import States
+from bot_old.handlers import media, base, user
+from bot_old.keyboards import constants as kb_val
+from bot_old.states import States
 
 from core.config import settings
 from utils.logs import logger

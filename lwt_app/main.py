@@ -1,4 +1,4 @@
-from bot import run_bot
+from bot_old import run_bot
 from utils.logs import logger
 
 
