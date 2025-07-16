@@ -1,13 +1,11 @@
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-from bot.keyboards import constants as const
-
-
 from aiogram.types import (
-    ReplyKeyboardMarkup,
-    KeyboardButton,
+    InlineKeyboardButton,
     InlineKeyboardMarkup,
-    InlineKeyboardButton
+    KeyboardButton,
+    ReplyKeyboardMarkup,
 )
+
+from bot.keyboards import constants as const
 
 # Reply-кнопки
 
@@ -27,9 +25,7 @@ def auth_keyboard():
     )
 
 
-
 # Inline-кнопки
-
 def check_approval_keyboard():
     return InlineKeyboardMarkup(
         inline_keyboard=[

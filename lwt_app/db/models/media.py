@@ -1,9 +1,18 @@
-from sqlalchemy import BigInteger, Integer, String, Boolean, Enum, Text, ForeignKey
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from core.database import BaseModel
 from typing import TYPE_CHECKING
 
 from entities.enum import MediaTypeEnum
+from sqlalchemy import (
+    BigInteger,
+    Boolean,
+    Enum,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+)
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from core.database import BaseModel
 
 if TYPE_CHECKING:
     from .user import User

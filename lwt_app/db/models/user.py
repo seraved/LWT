@@ -1,9 +1,10 @@
-from sqlalchemy import BigInteger
-from core.database import BaseModel
-from sqlalchemy.orm import mapped_column, Mapped, relationship
-from typing import List, TYPE_CHECKING
+from typing import TYPE_CHECKING, List
 
 from core.config import settings
+from sqlalchemy import BigInteger
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from core.database import BaseModel
 
 if TYPE_CHECKING:
     from .media import Media

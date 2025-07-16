@@ -1,9 +1,9 @@
 from dataclasses import dataclass
 from typing import Sequence
 
-from db.repository.base import BaseRepository, Pagination
 from db.models.media import Media
-from sqlalchemy import func, select, Select, exists, desc
+from db.repository.base import BaseRepository, Pagination
+from sqlalchemy import Select, desc, func, select
 
 from entities.media import MediaTypeEnum
 from entities.enum import WatchedEnum
@@ -62,7 +62,10 @@ class MediaRepository(BaseRepository[Media]):
             ).limit(
                 pagination.per_page
             )
-        stmt = stmt.order_by(desc(Media.id))
+        stmt = stmt.order_by(
+            Media.watched,
+            desc(Media.id)
+        )
         result = await self.session.execute(stmt)
         return result.scalars().all()
 

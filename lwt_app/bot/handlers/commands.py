@@ -1,13 +1,12 @@
 from aiogram import Router
-from aiogram.types import Message
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
+from aiogram.types import Message
 
-from services.user import UserService
-
-from bot.states import LWTStates
 from bot.keyboards import auth as auth_kb
 from bot.keyboards import lwt as lwt_kb
+from bot.states import LWTStates
+from services.user import UserService
 
 router = Router()
 

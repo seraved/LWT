@@ -1,9 +1,7 @@
-from aiogram.types import InputMediaPhoto, FSInputFile
+from aiogram.types import FSInputFile, InputMediaPhoto
 
-from entities.media import FoundMediaContent
+from entities.media import FoundMediaContent, MediaDTO
 from utils.logs import logger
-
-from entities.media import MediaDTO
 
 
 def content_media_builder(

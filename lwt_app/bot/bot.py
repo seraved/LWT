@@ -1,9 +1,10 @@
-from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
-from aiogram.client.default import DefaultBotProperties
-from bot.handlers import router
 import asyncio
 
+from aiogram import Bot, Dispatcher
+from aiogram.client.default import DefaultBotProperties
+from aiogram.enums import ParseMode
+
+from bot.handlers import router
 from core.config import settings
 
 bot = Bot(

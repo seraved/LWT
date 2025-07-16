@@ -1,9 +1,10 @@
 
 from db.models import Media
 from db.repository.media import MediaFilter, MediaRepository, Pagination
+
+from entities.enum import MediaTypeEnum, WatchedEnum
 from entities.media import MediaDTO, NewMediaDTO
 from entities.user import UserDTO
-from entities.enum import WatchedEnum, MediaTypeEnum
 
 
 class MediaService:

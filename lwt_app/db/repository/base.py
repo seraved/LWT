@@ -1,11 +1,11 @@
-from types import TracebackType
-from typing import TypeVar, Generic, Self
-from dataclasses import dataclass
-
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import Select
-from core.database import async_session_factory, BaseModel
 from contextlib import AbstractAsyncContextManager
+from dataclasses import dataclass
+from types import TracebackType
+from typing import Generic, Self, TypeVar
+
+from core.database import BaseModel, async_session_factory
+from sqlalchemy import Select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 ModelT = TypeVar("ModelT", bound=BaseModel)
 

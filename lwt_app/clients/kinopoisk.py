@@ -1,10 +1,10 @@
-from typing import Any
-from aiohttp import ClientSession
 from contextlib import AbstractAsyncContextManager
-from entities.media import FoundMediaContent
-from core.config import settings
-from utils.logs import logger
+from typing import Any
 
+from aiohttp import ClientSession
+from core.config import settings
+from entities.media import FoundMediaContent
+from utils.logs import logger
 
 KINOPOISK_URL = "https://api.kinopoisk.dev"
 

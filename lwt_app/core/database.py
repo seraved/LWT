@@ -1,14 +1,10 @@
-from sqlalchemy import DateTime, BigInteger
-from sqlalchemy.sql import func
-from sqlalchemy.orm import mapped_column, Mapped
-from sqlalchemy.ext.asyncio import (
-    async_sessionmaker,
-    create_async_engine,
-)
 from datetime import datetime
-from sqlalchemy.orm import DeclarativeBase
 
 from core.config import settings
+from sqlalchemy import DateTime
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.sql import func
 
 async_engine = create_async_engine(
     settings.DB_DSN_async,

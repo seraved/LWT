@@ -6,12 +6,12 @@ from aiogram.types import CallbackQuery, Message
 from bot.keyboards import constants as const
 from bot.keyboards import lwt as lwt_kb
 from bot.states import LWTStates
+from entities.enum import WatchedEnum
 from services.media import MediaService
 from utils.logs import logger
+from utils.mapper import key_to_media_type, key_to_text
 
 from .common import content_media_builder
-from entities.enum import WatchedEnum
-from utils.mapper import key_to_media_type, key_to_text
 
 router = Router()
 

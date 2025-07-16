@@ -4,8 +4,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
 from bot.keyboards import auth as auth_kb
-from bot.keyboards import lwt as lwt_kb
 from bot.keyboards import constants as const
+from bot.keyboards import lwt as lwt_kb
 from bot.states import LWTStates
 from entities.user import NewUserDTO
 from services.user import UserService
