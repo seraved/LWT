@@ -2,7 +2,8 @@
 pydantic-settings==2.10.1
 
 # BOT
-python-telegram-bot==22.2
+# python-telegram-bot==22.2
+aiogram==3.21.0
 
 # DB
 alembic==1.7.7

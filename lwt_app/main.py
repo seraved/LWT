@@ -1,7 +1,8 @@
-from bot_old import run_bot
-from utils.logs import logger
+import asyncio
 
+from bot.bot import main
+from utils.logs import logger
 
 if __name__ == "__main__":
     logger.info("Start")
-    run_bot()
+    asyncio.run(main())

@@ -9,12 +9,12 @@ from services.media import MediaService
 from entities.media import NewMediaDTO
 from utils import getters as getter
 from utils.logs import logger
-from entities.media import MediaType
+from entities.enum import MediaTypeEnum
 
 MEDIA_TYPE_KEY_MAP = {
-    kb_val.KEY_MOVIE: MediaType.MOVIE,
-    kb_val.KEY_SERIES: MediaType.SERIES,
-    kb_val.KEY_ANIME: MediaType.ANIME,
+    kb_val.KEY_MOVIE: MediaTypeEnum.MOVIE,
+    kb_val.KEY_SERIES: MediaTypeEnum.SERIES,
+    kb_val.KEY_ANIME: MediaTypeEnum.ANIME,
 }
 
 
@@ -48,11 +48,11 @@ async def get_adding_media_type(update: Update, context: ContextTypes.DEFAULT_TY
 
     context.user_data["add_media_type"] = media_type
 
-    if media_type is MediaType.MOVIE:
+    if media_type is MediaTypeEnum.MOVIE:
         msg_text = "Какой фильм добавляем?"
-    elif media_type is MediaType.SERIES:
+    elif media_type is MediaTypeEnum.SERIES:
         msg_text = "Какой сериал добавляем?"
-    elif media_type is MediaType.ANIME:
+    elif media_type is MediaTypeEnum.ANIME:
         msg_text = "Какое аниме добавляем?"
     else:
         msg_text = "Неизвестный тип контента."  # Should not happen
@@ -81,9 +81,9 @@ async def save_media(update: Update, context: ContextTypes.DEFAULT_TYPE):
             user_id=user_id,
         )
     )
-    if context.user_data["add_media_type"] == MediaType.MOVIE:
+    if context.user_data["add_media_type"] == MediaTypeEnum.MOVIE:
         msg_text = "✅ Фильм добавлен!"
-    elif context.user_data["add_media_type"] == MediaType.SERIES:
+    elif context.user_data["add_media_type"] == MediaTypeEnum.SERIES:
         msg_text = "✅ Сериал добавлен!"
     else:
         msg_text = "✅ Аниме добавлено!"

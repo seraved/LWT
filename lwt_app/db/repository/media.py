@@ -3,23 +3,25 @@ from typing import Sequence
 
 from db.repository.base import BaseRepository, Pagination
 from db.models.media import Media
-from sqlalchemy import func, select, Select
+from sqlalchemy import func, select, Select, exists
 
-from entities.media import MediaType, WatchedEnum
+from entities.media import MediaTypeEnum
+from entities.enum import WatchedEnum
 
 
 @dataclass(kw_only=True, frozen=True, slots=True)
 class MediaFilter:
     user_id: int | None = None
-    title: str | None = None
-    media_type: MediaType | None = None
+    name: str | None = None
+    year: int | None = None
+    media_type: MediaTypeEnum | None = None
     watched: WatchedEnum = WatchedEnum.ALL
 
     def apply(self, stmt: Select) -> Select:
         if self.user_id is not None:
             stmt = stmt.where(Media.user_id == self.user_id)
-        if self.title is not None:
-            stmt = stmt.where(Media.title.ilike(f"%{self.title}%"))
+        if self.name is not None:
+            stmt = stmt.where(Media.name.ilike(f"%{self.name}%"))
         if self.media_type is not None:
             stmt = stmt.where(Media.media_type == self.media_type)
         if self.watched is WatchedEnum.UNWATCHED:
@@ -69,3 +71,18 @@ class MediaRepository(BaseRepository[Media]):
             return None
         media.watched = not media.watched
         await self.update(media)
+
+    async def exist(self, media_filter: MediaFilter) -> bool:
+        stmt = media_filter.apply(select(Media.id))
+        result = await self.session.scalar(stmt)
+        return bool(result)
+
+    async def create_if_not_exists(self, media: Media) -> Media | None:
+        exists_filter = MediaFilter(
+            name=media.name,
+            year=media.year,
+            user_id=media.user_id,
+        )
+        if await self.exist(exists_filter):
+            return None
+        return await self.create(media)

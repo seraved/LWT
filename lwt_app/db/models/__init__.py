@@ -1,8 +1,7 @@
 from .user import User
-from .media import Media, MediaType
+from .media import Media
 
 __all__ = [
     "User",
     "Media",
-    "MediaType",
 ]
