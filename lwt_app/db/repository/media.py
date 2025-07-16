@@ -3,7 +3,7 @@ from typing import Sequence
 
 from db.repository.base import BaseRepository, Pagination
 from db.models.media import Media
-from sqlalchemy import func, select, Select, exists
+from sqlalchemy import func, select, Select, exists, desc
 
 from entities.media import MediaTypeEnum
 from entities.enum import WatchedEnum
@@ -62,15 +62,16 @@ class MediaRepository(BaseRepository[Media]):
             ).limit(
                 pagination.per_page
             )
+        stmt = stmt.order_by(desc(Media.id))
         result = await self.session.execute(stmt)
         return result.scalars().all()
 
-    async def toggle_watched_status(self, media_id: int) -> None:
+    async def toggle_watched_status(self, media_id: int) -> Media | None:
         media = await self.get_by_id(media_id)
         if media is None:
             return None
         media.watched = not media.watched
-        await self.update(media)
+        return await self.update(media)
 
     async def exist(self, media_filter: MediaFilter) -> bool:
         stmt = media_filter.apply(select(Media.id))

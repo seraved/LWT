@@ -12,22 +12,30 @@ ADDED_TEXT = "✅ Добавлено"
 PAGE_BACK_TEXT = "◀️ Предыдущий"
 PAGE_FORWARD_TEXT = "Следующий ▶️"
 PAGE_SELECT_TEXT = "✅ Выбрать"
-
+PAGE_SET_WATCHED = "👁️‍🗨️ Отметить просмотренным"
+PAGE_SET_UNWATCHED = "⭕️ Отметить непросмотренным"
 
 # TEXT TYPE MEDIA
-FILM_TEXT = "🎬 Фильм"
+MOVIE_TEXT = "🎬 Фильм"
 SERIES_TEXT = "📺 Сериал"
 ANIME_TEXT = "🇯🇵 Аниме"
 ALL_TYPE_TEXT = "🗂️ Всё"
+APPLY_FILTER_TEXT = "🔍 Применить фильтр"
+WATCHED_TEXT = "✅ Просмотрено"
+UNWATCHED_TEXT = "🟡 Не просмотрено"
 
 # InlineKeyboardButton
-KEY_ANIME = "add_anime__"
-KEY_MOVIE = "add_movie__"
-KEY_SERIES = "add_series__"
+KEY_TYPE_ANIME = "anime__"
+KEY_TYPE_MOVIE = "movie__"
+KEY_TYPE_SERIES = "series__"
 KEY_ALL = "all__"
+KEY_IS_WATCHED = "is_watched__"
+KEY_IS_UNWATCHED = "is_unwatched__"
 
-KEY_TO_SELECT_TYPE = "select_type__"
+KEY_APPLY_FILTER = "apply_filter__"
 KEY_TO_HONE_TYPE = "to_home_menu__"
+
+PRE_KEY_UPD_WATCHED = "upd_watched__"
 
 KEY_RETURN_TO_SELECTION = "main_menu__"
 KEY_CHECK_APP_TEXT = "check_approval__"

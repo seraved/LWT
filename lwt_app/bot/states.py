@@ -8,11 +8,10 @@ class AuthStates(StatesGroup):
 
 
 class LWTStates(AuthStates):
-    # TODO TASK: Убрать лишние 
+    # TODO TASK: Убрать лишние
     home = State()
     # Добавить - выбрать тип - получить название - найти на кинопоиске - утвердить - сохранить - домой
     adding_media = State()
-    select_media_type = State()
     get_title = State()
     select_result = State()
     approval_media = State()
@@ -20,3 +19,4 @@ class LWTStates(AuthStates):
 
     #
     showing_media = State()
+    list_content = State()

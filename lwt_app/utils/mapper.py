@@ -1,12 +1,6 @@
 from typing import Any
-from bot.keyboards.constants import (
-    KEY_ANIME,
-    KEY_MOVIE,
-    KEY_SERIES,
-    ANIME_TEXT,
-    FILM_TEXT,
-    SERIES_TEXT,
-)
+from bot.keyboards import constants as const
+
 from entities.enum import MediaTypeEnum
 
 MEDIA_TYPE_RUS_MAP = {
@@ -18,15 +12,15 @@ MEDIA_TYPE_RUS_MAP = {
 }
 
 KEY_TO_MEDIA_TYPE_MAP = {
-    KEY_MOVIE: MediaTypeEnum.MOVIE,
-    KEY_SERIES: MediaTypeEnum.SERIES,
-    KEY_ANIME: MediaTypeEnum.ANIME,
+    const.KEY_TYPE_MOVIE: MediaTypeEnum.MOVIE,
+    const.KEY_TYPE_SERIES: MediaTypeEnum.SERIES,
+    const.KEY_TYPE_ANIME: MediaTypeEnum.ANIME,
 }
 
 KEY_TO_TEXT_MAP = {
-    KEY_MOVIE: FILM_TEXT,
-    KEY_SERIES: SERIES_TEXT,
-    KEY_ANIME: ANIME_TEXT,
+    const.KEY_TYPE_MOVIE: const.MOVIE_TEXT,
+    const.KEY_TYPE_SERIES: const.SERIES_TEXT,
+    const.KEY_TYPE_ANIME: const.ANIME_TEXT,
 }
 
 KPOISK_TYPE_TO_MEDIA_TYPE = {

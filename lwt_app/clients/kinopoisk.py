@@ -33,7 +33,9 @@ class KinopoiskClient(AbstractAsyncContextManager):
         result: list[FoundMediaContent] = []
         for row in response_data["docs"]:
             genres = ', '.join((g["name"] for g in row.get("genres", [])))
-            poster_url = row.get("poster", {}).get("previewUrl", "")
+            poster_url = row.get("poster", {})
+            if isinstance(poster_url, dict):
+                poster_url = poster_url.get("previewUrl", "")
             try:
                 result.append(
                     FoundMediaContent(

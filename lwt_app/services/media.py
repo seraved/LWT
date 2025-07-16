@@ -49,21 +49,21 @@ class MediaService:
         self,
         user_id: int,
         media_type: MediaTypeEnum | None = None,
-        watched_filter: str | None = None,
+        watched_filter: WatchedEnum | None = None,
     ) -> int:
         async with self.media_repository() as repo:
             return await repo.get_count(
                 filters=MediaFilter(
                     user_id=user_id,
                     media_type=media_type,
-                    watched=WatchedEnum[watched_filter] if watched_filter else WatchedEnum.ALL
+                    watched=watched_filter if watched_filter else WatchedEnum.ALL
                 )
             )
 
     async def get_user_media(
         self,
         user_id: int,
-        watched_filter: str | None = None,
+        watched_filter: WatchedEnum | None = None,
         media_type: MediaTypeEnum | None = None,
         page: int = 1,
         per_page: int = 3,
@@ -75,7 +75,7 @@ class MediaService:
         filters = MediaFilter(
             user_id=user_id,
             media_type=media_type,
-            watched=WatchedEnum[watched_filter] if watched_filter else WatchedEnum.ALL
+            watched=watched_filter if watched_filter else WatchedEnum.ALL
         )
         async with self.media_repository() as repo:
             user_media = await repo.get_user_media(
@@ -84,6 +84,7 @@ class MediaService:
             )
         return [self.model_to_dto(media) for media in user_media]
 
-    async def toggle_watched_status(self, media_id: int) -> None:
+    async def toggle_watched_status(self, media_id: int) -> MediaDTO | None:
         async with self.media_repository() as repo:
-            await repo.toggle_watched_status(media_id)
+            media = await repo.toggle_watched_status(media_id)
+            return self.model_to_dto(media) if media else None

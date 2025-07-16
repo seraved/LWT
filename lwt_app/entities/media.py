@@ -21,6 +21,14 @@ class BaseMedia:
 class FoundMediaContent(BaseMedia):
     pass
 
+    def to_msg(self) -> str:
+        return (
+            f"<b>{self.name}</b> ({self.year})\n"
+            f"<b>Тип</b>: {self.media_type}\n"
+            f"<b>Жанр</b>: {self.genres}\n"
+            f"\n{self.description}"
+        )
+
 
 @dataclass(kw_only=True, frozen=True, slots=True)
 class NewMediaDTO(BaseMedia):
@@ -59,4 +67,10 @@ class MediaDTO(NewMediaDTO):
 
     def to_msg(self) -> str:
         m_type = media_type_to_text(self.media_type, 'EMPTY')
-        return f"{self.status} {self.title} ({m_type})"
+        return (
+            f"Просмотрено: {self.status}\n"
+            f"<b>{self.name}</b> ({self.year})\n"
+            f"<b>Тип</b>: {m_type}\n"
+            f"<b>Жанр</b>: {self.genres}\n"
+            f"\n{self.description}"
+        )

@@ -1,16 +1,19 @@
-from aiogram import F, Router, Bot
+from aiogram import F, Router
 from aiogram.exceptions import AiogramError
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message, InputMediaPhoto, FSInputFile
+from aiogram.types import CallbackQuery, Message
 
-from bot.keyboards import lwt as lwt_kb
 from bot.keyboards import constants as const
+from bot.keyboards import lwt as lwt_kb
 from bot.states import LWTStates
-from entities.media import NewMediaDTO, FoundMediaContent
-from services.user import UserService
-from services.media import MediaService
-from utils.logs import logger
 from clients.kinopoisk import KinopoiskClient
+from entities.media import NewMediaDTO
+from services.media import MediaService
+from services.user import UserService
+from utils.logs import logger
+
+from .common import content_media_builder
+
 router = Router()
 
 BASE_TEXT = "Я LWT бот."
@@ -23,28 +26,7 @@ async def start_add_media(message: Message, state: FSMContext, **kwargs):
     await message.delete()
     await message.answer(
         text="Что требуется найти?",
-        reply_markup=lwt_kb.inl_back_to_home_state()
-    )
-
-
-def _create_media(content: FoundMediaContent, status: str = "") -> InputMediaPhoto:
-    caption = (
-        f"{status}\n"
-        f"<b>{content.name}</b> ({content.year})\n"
-        f"<b>Тип</b>: {content.media_type}\n"
-        f"<b>Жанр</b>: {content.genres}\n"
-        f"\n{content.description}"
-    )
-    if content.poster_url:
-        return InputMediaPhoto(
-            media=content.poster_url,
-            caption=f"{caption[:1000]} ...",
-            parse_mode="HTML",
-        )
-    return InputMediaPhoto(
-        media=FSInputFile("lwt_app/bot/img/media_img_plug.png"),
-        caption=f"{caption[:1000]} ...",
-        parse_mode="HTML",
+        reply_markup=lwt_kb.inl_back_to_home_state_keyboard()
     )
 
 
@@ -52,7 +34,7 @@ def _create_media(content: FoundMediaContent, status: str = "") -> InputMediaPho
     LWTStates.get_title,
     F.text.not_in((const.ADD_CONTENT_TEXT, const.SHOW_CONTENT_TEXT))
 )
-async def get_content_title(message: Message, state: FSMContext,  bot: Bot):
+async def get_content_title(message: Message, state: FSMContext):
     """Получаем сообщение с названием и начнем поиск """
     title_name = message.text
     if title_name is None:
@@ -64,7 +46,7 @@ async def get_content_title(message: Message, state: FSMContext,  bot: Bot):
     if not found_content:
         await message.answer(
             text="Ничего не нашел, попробуй написать иначе",
-            reply_markup=lwt_kb.inl_back_to_home_state()
+            reply_markup=lwt_kb.inl_back_to_home_state_keyboard()
         )
         return
 
@@ -75,7 +57,7 @@ async def get_content_title(message: Message, state: FSMContext,  bot: Bot):
 
     message_media, *_ = await message.answer_media_group(
         media=[
-            _create_media(
+            content_media_builder(
                 content=found_content[page],
                 status=f"{page +1} / {len(found_content)}"
             )
@@ -100,9 +82,9 @@ async def go_back_to_home(callback: CallbackQuery, state: FSMContext):
 
     await state.set_data(data={"title": None})
 
+    await message.delete_reply_markup()
     await message.edit_text(
-        text=BASE_TEXT,
-        reply_markup=lwt_kb.inl_empty_keyboard()
+        text=BASE_TEXT,  # TODO выводить статистимку
     )
     await state.set_state(LWTStates.home)
 
@@ -125,7 +107,7 @@ async def list_founded_values(callback: CallbackQuery, state: FSMContext):
     page = int(callback.data.split("__")[1])
     # TODO feat: кнопка Вернуться и поискать другое
     await callback.message.edit_media(
-        media=_create_media(
+        media=content_media_builder(
             content=found_content[page],
             status=f"{page +1} / {len(found_content)}"
         ),
@@ -165,12 +147,12 @@ async def select_found_value(callback: CallbackQuery, state: FSMContext):
         user=user,
         media_content=NewMediaDTO.from_found_content(content)
     )
+    await callback.message.delete_reply_markup()
     await callback.message.edit_media(
-        media=_create_media(
+        media=content_media_builder(
             content=content,
             status=const.ADDED_TEXT,
         ),
-        reply_markup=lwt_kb.inl_empty_keyboard()
     )
     await state.update_data(data={"found_content": None})
     found_content = await state.get_value("found_content")
