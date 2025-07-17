@@ -44,7 +44,7 @@ class KinopoiskClient(AbstractAsyncContextManager):
                         year=row["year"],
                         description=row["description"],
                         poster_url=poster_url,
-                        series_length=row.get("seriesLength") or 0,
+                        series_length=row.get("seriesLength") or 1,
                         kinopoisk_id=row["id"],
                         genres=genres,
                     )

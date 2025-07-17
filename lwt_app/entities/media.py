@@ -1,8 +1,10 @@
 
-from dataclasses import dataclass
+from typing import Any
+from dataclasses import dataclass, asdict
 
 from utils.mapper import media_type_to_text, kinopoisk_media_type
 from entities.enum import MediaTypeEnum
+from utils.text import clear
 
 
 @dataclass(kw_only=True, frozen=True, slots=True)
@@ -16,17 +18,22 @@ class BaseMedia:
     kinopoisk_id: int
     genres: str
 
+    def as_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
 
 @dataclass(kw_only=True, frozen=True, slots=True)
 class FoundMediaContent(BaseMedia):
     pass
 
     def to_msg(self) -> str:
-        return (
-            f"<b>{self.name}</b> ({self.year})\n"
-            f"<b>Тип</b>: {self.media_type}\n"
-            f"<b>Жанр</b>: {self.genres}\n"
-            f"\n{self.description}"
+        return clear(
+            raw=(
+                f"<b>{self.name}</b> ({self.year})\n"
+                f"<b>Тип</b>: {self.media_type}\n"
+                f"<b>Жанр</b>: {self.genres}\n"
+                f"\n{self.description}"
+            )
         )
 
 

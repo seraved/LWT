@@ -7,12 +7,12 @@ from bot.keyboards import constants as const
 from bot.keyboards import lwt as lwt_kb
 from bot.states import LWTStates
 from clients.kinopoisk import KinopoiskClient
-from entities.media import NewMediaDTO
+from entities.media import FoundMediaContent, NewMediaDTO
 from services.media import MediaService
 from services.user import UserService
 from utils.logs import logger
 
-from .common import content_media_builder
+from .common import content_media_builder, message_answer_founded_media, callback_message_edit_founded_media
 
 router = Router()
 
@@ -22,7 +22,7 @@ BASE_TEXT = "Я LWT бот."
 @router.message(F.text == const.ADD_CONTENT_TEXT)
 async def start_add_media(message: Message, state: FSMContext, **kwargs):
     """Сообщение-ветка для добавления контента -> Выбор типа"""
-    await state.set_state(LWTStates.get_title)
+    await state.set_state(LWTStates.adding_media)
     await message.delete()
     await message.answer(
         text="Что требуется найти?",
@@ -31,7 +31,7 @@ async def start_add_media(message: Message, state: FSMContext, **kwargs):
 
 
 @router.message(
-    LWTStates.get_title,
+    LWTStates.adding_media,
     F.text.not_in((const.ADD_CONTENT_TEXT, const.SHOW_CONTENT_TEXT))
 )
 async def get_content_title(message: Message, state: FSMContext):
@@ -55,15 +55,11 @@ async def get_content_title(message: Message, state: FSMContext):
 
     page = 0
 
-    message_media, *_ = await message.answer_media_group(
-        media=[
-            content_media_builder(
-                content=found_content[page],
-                status=f"{page +1} / {len(found_content)}"
-            )
-        ],
-    )
-    await message_media.edit_reply_markup(
+    await message_answer_founded_media(
+        message=message,
+        found_content=found_content[page],
+        page=page,
+        total_pages=len(found_content),
         reply_markup=lwt_kb.inl_found_content_pagination(
             page=page,
             total_pages=len(found_content),
@@ -73,7 +69,7 @@ async def get_content_title(message: Message, state: FSMContext):
 
 @router.callback_query(
     F.data == const.KEY_TO_HONE_TYPE,
-    LWTStates.get_title,
+    LWTStates.adding_media,
 )
 async def go_back_to_home(callback: CallbackQuery, state: FSMContext):
     """Откат -> главное меню"""
@@ -106,11 +102,11 @@ async def list_founded_values(callback: CallbackQuery, state: FSMContext):
 
     page = int(callback.data.split("__")[1])
     # TODO feat: кнопка Вернуться и поискать другое
-    await callback.message.edit_media(
-        media=content_media_builder(
-            content=found_content[page],
-            status=f"{page +1} / {len(found_content)}"
-        ),
+    await callback_message_edit_founded_media(
+        message=callback.message,
+        found_content=found_content[page],
+        page=page,
+        total_pages=len(found_content),
         reply_markup=lwt_kb.inl_found_content_pagination(
             page=page,
             total_pages=len(found_content),
