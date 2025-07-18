@@ -16,11 +16,12 @@ class MediaFilter:
     name: str | None = None
     year: int | None = None
     media_type: MediaTypeEnum | None = None
-    is_delete: bool = False
+    is_delete: bool | None = False
     watched: WatchedEnum = WatchedEnum.ALL
 
     def apply(self, stmt: Select) -> Select:
-        stmt = stmt.where(Media.is_delete.is_(self.is_delete))
+        if self.is_delete is not None:
+            stmt = stmt.where(Media.is_delete.is_(self.is_delete))
         if self.user_id is not None:
             stmt = stmt.where(Media.user_id == self.user_id)
         if self.name is not None:
@@ -90,19 +91,21 @@ class MediaRepository(BaseRepository[Media]):
         media.watched = not media.watched
         return await self.update(media)
 
-    async def exist(self, media_filter: MediaFilter) -> bool:
-        stmt = media_filter.apply(select(Media.id))
-        result = await self.session.scalar(stmt)
-        return bool(result)
+    async def find_one(self, media_filter: MediaFilter) -> Media | None:
+        return await self.session.scalar(
+            statement=media_filter.apply(select(Media))
+        )
 
     async def create_if_not_exists(self, media: Media) -> Media | None:
         exists_filter = MediaFilter(
             name=media.name,
             year=media.year,
             user_id=media.user_id,
+            is_delete=None,
         )
-        if await self.exist(exists_filter):
-            return None
+        found_media = await self.find_one(exists_filter)
+        if found_media:
+            await self.delete(found_media)
         return await self.create(media)
 
     async def soft_delete(self, media: Media) -> None:

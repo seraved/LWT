@@ -57,6 +57,7 @@ class MediaService:
                 filters=MediaFilter(
                     user_id=user_id,
                     media_type=media_type,
+                    is_delete=False,
                     watched=watched_filter if watched_filter else WatchedEnum.ALL
                 )
             )
@@ -76,7 +77,8 @@ class MediaService:
         filters = MediaFilter(
             user_id=user_id,
             media_type=media_type,
-            watched=watched_filter if watched_filter else WatchedEnum.ALL
+            is_delete=False,
+            watched=watched_filter if watched_filter else WatchedEnum.ALL,
         )
         async with self.media_repository() as repo:
             user_media = await repo.get_user_media(
