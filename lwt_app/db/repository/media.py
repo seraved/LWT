@@ -25,7 +25,18 @@ class MediaFilter:
         if self.name is not None:
             stmt = stmt.where(Media.name.ilike(f"%{self.name}%"))
         if self.media_type is not None:
-            stmt = stmt.where(Media.media_type == self.media_type)
+            if self.media_type == MediaTypeEnum.ANIME:
+                stmt = stmt.where(
+                    Media.media_type.in_(
+                        (
+                            MediaTypeEnum.ANIME,
+                            MediaTypeEnum.CARTOON,
+                            MediaTypeEnum.ANIMATED_SERIES,
+                        )
+                    )
+                )
+            else:
+                stmt = stmt.where(Media.media_type == self.media_type)
         if self.watched is WatchedEnum.UNWATCHED:
             stmt = stmt.where(Media.watched == False)
         elif self.watched is WatchedEnum.WATCHED:
