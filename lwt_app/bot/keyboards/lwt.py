@@ -76,8 +76,8 @@ def inl_back_to_home_state_keyboard():
     )
 
 
-def inl_filters_keyboard():
-    return InlineKeyboardMarkup(inline_keyboard=[
+def inl_filters_keyboard(has_filter: bool = False):
+    inline_keyboard = [
         [
             InlineKeyboardButton(
                 text=const.MOVIE_TEXT,
@@ -102,19 +102,26 @@ def inl_filters_keyboard():
                 callback_data=const.KEY_IS_UNWATCHED,
             ),
         ],
-        [
-            InlineKeyboardButton(
-                text=const.ALL_TYPE_TEXT,
-                callback_data=const.KEY_ALL,
-            ),
-        ],
+    ]
+    if has_filter:
+        inline_keyboard.append(
+            [
+                InlineKeyboardButton(
+                    text=const.CLEAR_FILTER_TEXT,
+                    callback_data=const.KEY_ALL,
+                ),
+            ]
+        )
+
+    inline_keyboard.append(
         [
             InlineKeyboardButton(
                 text=const.APPLY_FILTER_TEXT,
                 callback_data=const.KEY_APPLY_FILTER,
             ),
         ]
-    ])
+    )
+    return InlineKeyboardMarkup(inline_keyboard=inline_keyboard)
 
 
 def inl_show_content_pagination(

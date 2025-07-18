@@ -78,10 +78,20 @@ async def go_back_to_home(callback: CallbackQuery, state: FSMContext):
 
     await state.set_data(data={"title": None})
 
+    user_id = callback.from_user.id or -1
+
     await message.delete_reply_markup()
+
+    media_stats = await MediaService().get_statistic(user_id)
     await message.edit_text(
-        text=BASE_TEXT,  # TODO выводить статистимку
+        text=(
+            f"Всего записей: {media_stats.total_cnt} \n"
+            f"{const.ANIME_TEXT}: {media_stats.anime_cnt} \n"
+            f"{const.MOVIE_TEXT}: {media_stats.movie_cnt} \n"
+            f"{const.SERIES_TEXT}: {media_stats.series_cnt} \n"
+        ),
     )
+
     await state.set_state(LWTStates.home)
 
 

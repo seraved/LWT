@@ -3,7 +3,7 @@ from db.models import Media
 from db.repository.media import MediaFilter, MediaRepository, Pagination
 
 from entities.enum import MediaTypeEnum, WatchedEnum
-from entities.media import MediaDTO, NewMediaDTO
+from entities.media import MediaDTO, MediaStatisticDTO, NewMediaDTO
 from entities.user import UserDTO
 
 
@@ -93,4 +93,21 @@ class MediaService:
     async def delete_content(self, media_id: int) -> None:
         async with self.media_repository() as repo:
             media = await repo.get_by_id(media_id=media_id)
-            await repo.soft_delete(media=media)
+            if media:
+                await repo.soft_delete(media=media)
+
+    async def get_statistic(self, user_id: int) -> MediaStatisticDTO:
+        async with self.media_repository() as repo:
+            media_stat = await repo.get_statistics(user_id)
+
+        return MediaStatisticDTO(
+            movie_cnt=media_stat.get(MediaTypeEnum.MOVIE, 0),
+            series_cnt=media_stat.get(MediaTypeEnum.SERIES, 0),
+            anime_cnt=sum(
+                (
+                    media_stat.get(MediaTypeEnum.ANIME, 0),
+                    media_stat.get(MediaTypeEnum.ANIMATED_SERIES, 0),
+                    media_stat.get(MediaTypeEnum.CARTOON, 0),
+                )
+            )
+        )

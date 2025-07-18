@@ -23,14 +23,19 @@ async def start_show_media(message: Message, state: FSMContext, **kwargs):
     """Сообщение-ветка для добавления контента -> Выбор типа"""
 
     await state.set_state(LWTStates.showing_media)
+    if message.from_user is None:
+        raise AiogramError("No from_user data")
+    user_id = message.from_user.id or -1
 
     await message.delete()
+
+    media_stats = await MediaService().get_statistic(user_id)
     await message.answer(
         text=(
-            f"Всего записей: 10 \n"
-            f"{const.ANIME_TEXT}: 1 \n"
-            f"{const.MOVIE_TEXT}: 2 \n"
-            f"{const.SERIES_TEXT}: 3 \n"
+            f"Всего записей: {media_stats.total_cnt} \n"
+            f"{const.ANIME_TEXT}: {media_stats.anime_cnt} \n"
+            f"{const.MOVIE_TEXT}: {media_stats.movie_cnt} \n"
+            f"{const.SERIES_TEXT}: {media_stats.series_cnt} \n"
         ),
         reply_markup=lwt_kb.inl_filters_keyboard()
     )
@@ -58,10 +63,10 @@ async def get_filter(callback: CallbackQuery, state: FSMContext):
     if callback.data in {const.KEY_IS_WATCHED, const.KEY_IS_UNWATCHED}:
         if callback.data == const.KEY_IS_WATCHED:
             show_filter["watched"] = WatchedEnum.WATCHED
-            show_filter["watched_text"] = "Только просмотренные"
+            show_filter["watched_text"] = "Только ✅ Просмотрено"
         else:
             show_filter["watched"] = WatchedEnum.UNWATCHED
-            show_filter["watched_text"] = "Только Не просмотренные"
+            show_filter["watched_text"] = "Только 🟡 Не просмотрено"
     if callback.data == const.KEY_ALL:
         show_filter = {}
 
@@ -73,7 +78,9 @@ async def get_filter(callback: CallbackQuery, state: FSMContext):
             f" - Тип: {show_filter.get('media_type_text') or 'Все'}\n"
             f" - Просмотренные: {show_filter.get('watched_text') or 'Все'}\n"
         ),
-        reply_markup=lwt_kb.inl_filters_keyboard()
+        reply_markup=lwt_kb.inl_filters_keyboard(
+            has_filter=bool(show_filter)
+        )
     )
 
 

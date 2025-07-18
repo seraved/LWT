@@ -1,9 +1,10 @@
+import asyncio
 from dataclasses import dataclass
 from typing import Sequence
 
 from db.models.media import Media
 from db.repository.base import BaseRepository, Pagination
-from sqlalchemy import Select, desc, func, select
+from sqlalchemy import Select, desc, func, select, not_
 
 from entities.media import MediaTypeEnum
 from entities.enum import WatchedEnum
@@ -107,3 +108,19 @@ class MediaRepository(BaseRepository[Media]):
     async def soft_delete(self, media: Media) -> None:
         media.is_delete = True
         await self.update(media)
+
+    async def get_statistics(self, user_id: int) -> dict[MediaTypeEnum, int]:
+        stmt = select(
+            Media.media_type,
+            func.count(),
+        ).where(
+            Media.user_id == user_id,
+            not_(Media.is_delete)
+        ).group_by(Media.media_type)
+
+        result = await self.session.execute(stmt)
+
+        return {
+            m_type: count
+            for m_type, count in result.all()
+        }

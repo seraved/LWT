@@ -81,3 +81,20 @@ class MediaDTO(NewMediaDTO):
             f"<b>Жанр</b>: {self.genres}\n"
             f"\n{self.description}"
         )
+
+
+@dataclass(frozen=True, kw_only=True, slots=True)
+class MediaStatisticDTO:
+    anime_cnt: int = 0
+    movie_cnt: int = 0
+    series_cnt: int = 0
+
+    @property
+    def total_cnt(self) -> int:
+        return sum(
+            (
+                self.anime_cnt,
+                self.movie_cnt,
+                self.series_cnt,
+            )
+        )
