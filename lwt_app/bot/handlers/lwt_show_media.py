@@ -92,7 +92,7 @@ async def show_content(callback: CallbackQuery, state: FSMContext):
     media_type = show_filter.get("media_type")
     watched = show_filter.get("watched")
     service = MediaService()
-    total = await service.get_media_count(
+    total = await service.get_user_media_count(
         user_id=user_id,
         media_type=media_type,
         watched_filter=watched,
@@ -148,7 +148,7 @@ async def list_content(callback: CallbackQuery, state: FSMContext):
     media_type = show_filter.get("media_type")
 
     service = MediaService()
-    total = await service.get_media_count(
+    total = await service.get_user_media_count(
         user_id=user_id,
         media_type=media_type,
     )
@@ -190,7 +190,7 @@ async def set_watched_unwatched(callback: CallbackQuery, state: FSMContext):
     media_type = show_filter.get("media_type")
 
     service = MediaService()
-    total = await service.get_media_count(
+    total = await service.get_user_media_count(
         user_id=user_id,
         media_type=media_type,
     )
@@ -216,4 +216,55 @@ async def set_watched_unwatched(callback: CallbackQuery, state: FSMContext):
         )
     )
 
-# TODO feat: Добавить удаление
+
+@router.callback_query(
+    LWTStates.list_content,
+    F.data.startswith(const.PRE_KEY_DELETE)
+)
+async def approve_del_content(callback: CallbackQuery, state: FSMContext):
+    if callback.data is None:
+        raise AiogramError("No callback data")
+
+    if callback.message is None:
+        raise AiogramError("No callback message")
+
+    args = callback.data.split("__")
+    page, content_id = int(args[1]), int(args[2])
+
+    await callback.message.edit_reply_markup(
+        reply_markup=lwt_kb.inl_approve_delete_keyboard(
+            page=page,
+            content_id=content_id
+        )
+    )
+    await callback.answer()
+
+
+@router.callback_query(
+    LWTStates.list_content,
+    F.data.startswith(const.PRE_KEY_DELETE_CONFIRM)
+)
+async def del_content(callback: CallbackQuery, state: FSMContext):
+    if callback.data is None:
+        raise AiogramError("No callback data")
+
+    if callback.message is None:
+        raise AiogramError("No callback message")
+
+    content_id = int(callback.data.split("__")[1])
+    service = MediaService()
+    await service.delete_content(media_id=content_id)
+
+    show_filter = await state.get_value("show_filter") or {}
+    user_id = callback.from_user.id or -1
+    media_type = show_filter.get("media_type")
+
+    total = await service.get_user_media_count(
+        user_id=user_id,
+        media_type=media_type,
+    )
+
+    await callback.message.edit_caption(
+        caption="Удалено!",
+        reply_markup=lwt_kb.inl_after_del_first_page(),
+    )

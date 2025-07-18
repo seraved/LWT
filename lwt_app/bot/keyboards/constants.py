@@ -3,7 +3,8 @@ AUTH_BTN_TEXT = '🔐 Авторизоваться'
 ADD_CONTENT_TEXT = "➕ Добавить запись"
 SHOW_CONTENT_TEXT = "📋 Мои записи"
 REGISTRATION_TEXT = "📱 Подать заявку"
-CANCEL_TEXT = "❌ Отменить"
+DELETE_TEXT = "❌ Удалить"
+CONFIRM_DELETE_TEXT = "✅ Подтвердить удаление"
 CHECK_APP_AGAIN_TEXT = "🔄 Проверить статус заявки"
 BACK_TEXT = "↩️ Назад"
 
@@ -36,6 +37,8 @@ KEY_APPLY_FILTER = "apply_filter__"
 KEY_TO_HONE_TYPE = "to_home_menu__"
 
 PRE_KEY_UPD_WATCHED = "upd_watched__"
+PRE_KEY_DELETE = "delete__"
+PRE_KEY_DELETE_CONFIRM = "delete_confirm__"
 
 KEY_RETURN_TO_SELECTION = "main_menu__"
 KEY_CHECK_APP_TEXT = "check_approval__"

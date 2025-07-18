@@ -46,7 +46,7 @@ class MediaService:
         async with self.media_repository() as repo:
             await repo.create_if_not_exists(media)
 
-    async def get_media_count(
+    async def get_user_media_count(
         self,
         user_id: int,
         media_type: MediaTypeEnum | None = None,
@@ -89,3 +89,8 @@ class MediaService:
         async with self.media_repository() as repo:
             media = await repo.toggle_watched_status(media_id)
             return self.model_to_dto(media) if media else None
+
+    async def delete_content(self, media_id: int) -> None:
+        async with self.media_repository() as repo:
+            media = await repo.get_by_id(media_id=media_id)
+            await repo.soft_delete(media=media)

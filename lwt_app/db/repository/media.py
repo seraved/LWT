@@ -15,9 +15,11 @@ class MediaFilter:
     name: str | None = None
     year: int | None = None
     media_type: MediaTypeEnum | None = None
+    is_delete: bool = False
     watched: WatchedEnum = WatchedEnum.ALL
 
     def apply(self, stmt: Select) -> Select:
+        stmt = stmt.where(Media.is_delete.is_(self.is_delete))
         if self.user_id is not None:
             stmt = stmt.where(Media.user_id == self.user_id)
         if self.name is not None:
@@ -90,3 +92,7 @@ class MediaRepository(BaseRepository[Media]):
         if await self.exist(exists_filter):
             return None
         return await self.create(media)
+
+    async def soft_delete(self, media: Media) -> None:
+        media.is_delete = True
+        await self.update(media)

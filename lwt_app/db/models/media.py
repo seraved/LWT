@@ -31,6 +31,7 @@ class Media(BaseModel):
     kinopoisk_id: Mapped[int] = mapped_column(Integer, default=0)
     genres: Mapped[str] = mapped_column(Text, default="")
     watched: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_delete: Mapped[bool] = mapped_column(Boolean, default=False)
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.user_id"), nullable=False)
 

@@ -15,3 +15,4 @@ class LWTStates(AuthStates):
 
     showing_media = State()
     list_content = State()
+    del_content = State()
