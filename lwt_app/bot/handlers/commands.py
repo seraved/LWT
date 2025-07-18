@@ -8,6 +8,8 @@ from bot.keyboards import lwt as lwt_kb
 from bot.states import LWTStates
 from services.user import UserService
 
+from .common import get_statistic_msg
+
 router = Router()
 
 
@@ -37,8 +39,10 @@ async def start(message: Message, state: FSMContext):
     if user.is_approved:
         await state.set_state(LWTStates.home)
         await state.set_data(data={"user": user})
+
+        stat_msg = await get_statistic_msg(user_id=user_id)
         await message.answer(
-            f"Привет! {user.full_name}!",
+            text=f"Привет! {user.full_name}! \n\n {stat_msg}",
             reply_markup=lwt_kb.rep_lwt_home_keyboard()
         )
         return

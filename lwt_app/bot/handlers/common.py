@@ -4,10 +4,11 @@ from aiogram.types import (
     InlineKeyboardMarkup,
     InputMediaPhoto,
     MaybeInaccessibleMessageUnion,
-    Message,
+    Message
 )
-
+from bot.keyboards import constants as const
 from entities.media import FoundMediaContent, MediaDTO
+from services.media import MediaService
 from utils.logs import logger
 
 
@@ -88,3 +89,13 @@ async def callback_message_edit_founded_media(
             ),
             reply_markup=reply_markup,
         )
+
+
+async def get_statistic_msg(user_id: int) -> str:
+    media_stats = await MediaService().get_statistic(user_id)
+    return (
+        f"Всего записей: {media_stats.total_cnt} \n"
+        f"{const.ANIME_TEXT}: {media_stats.anime_cnt} \n"
+        f"{const.MOVIE_TEXT}: {media_stats.movie_cnt} \n"
+        f"{const.SERIES_TEXT}: {media_stats.series_cnt} \n"
+    )

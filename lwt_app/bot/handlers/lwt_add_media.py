@@ -12,7 +12,12 @@ from services.media import MediaService
 from services.user import UserService
 from utils.logs import logger
 
-from .common import content_media_builder, message_answer_founded_media, callback_message_edit_founded_media
+from .common import (
+    content_media_builder,
+    message_answer_founded_media,
+    callback_message_edit_founded_media,
+    get_statistic_msg,
+)
 
 router = Router()
 
@@ -82,14 +87,8 @@ async def go_back_to_home(callback: CallbackQuery, state: FSMContext):
 
     await message.delete_reply_markup()
 
-    media_stats = await MediaService().get_statistic(user_id)
     await message.edit_text(
-        text=(
-            f"Всего записей: {media_stats.total_cnt} \n"
-            f"{const.ANIME_TEXT}: {media_stats.anime_cnt} \n"
-            f"{const.MOVIE_TEXT}: {media_stats.movie_cnt} \n"
-            f"{const.SERIES_TEXT}: {media_stats.series_cnt} \n"
-        ),
+        text=await get_statistic_msg(user_id=user_id)
     )
 
     await state.set_state(LWTStates.home)
