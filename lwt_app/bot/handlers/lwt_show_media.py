@@ -264,8 +264,8 @@ async def del_content(callback: CallbackQuery, state: FSMContext):
         user_id=user_id,
         media_type=media_type,
     )
-
+    await state.set_data(data={"show_filter": {}})
     await callback.message.edit_caption(
         caption="Удалено!",
-        reply_markup=lwt_kb.inl_after_del_first_page(),
+        reply_markup=lwt_kb.inl_after_del_first_page() if total else None,
     )

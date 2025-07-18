@@ -21,6 +21,10 @@ class BaseMedia:
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+    @property
+    def link(self) -> str:
+        return f"<b><a href='https://flcksbr.top/series/{self.kinopoisk_id}/'>Смотреть</a></b>"
+
 
 @dataclass(kw_only=True, frozen=True, slots=True)
 class FoundMediaContent(BaseMedia):
@@ -29,7 +33,7 @@ class FoundMediaContent(BaseMedia):
     def to_msg(self) -> str:
         return clear(
             raw=(
-                f"<b>{self.name}</b> ({self.year})\n"
+                f"<b>{self.name}</b> ({self.year}) {self.link}\n"
                 f"<b>Тип</b>: {self.media_type}\n"
                 f"<b>Жанр</b>: {self.genres}\n"
                 f"\n{self.description}"
@@ -76,7 +80,7 @@ class MediaDTO(NewMediaDTO):
         m_type = media_type_to_text(self.media_type, 'EMPTY')
         return (
             f"Просмотрено: {self.status}\n"
-            f"<b>{self.name}</b> ({self.year})\n"
+            f"<b>{self.name}</b> ({self.year}) {self.link}\n"
             f"<b>Тип</b>: {m_type}\n"
             f"<b>Жанр</b>: {self.genres}\n"
             f"\n{self.description}"
