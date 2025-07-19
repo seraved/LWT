@@ -2,11 +2,9 @@ services:
   lwt_bot:
     platform: linux/arm64
     build:
-      context: ${HOST_ROOT}
+      context: .
       dockerfile: Dockerfile
     container_name: lwt_bot
-    volumes:
-      - ${HOST_ROOT}:/home/appuser/app
     env_file:
       - stack.env
     depends_on:
