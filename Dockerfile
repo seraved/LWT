@@ -47,3 +47,7 @@ RUN chmod +x ./entrypoint.sh
 # Переключаемся на непривилегированного пользователя
 USER appuser
 
+COPY . .
+
+# # Команда для запуска приложения
+CMD ["python", "./lwt_app/main.py"]
