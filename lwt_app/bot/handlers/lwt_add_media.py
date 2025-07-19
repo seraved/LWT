@@ -125,26 +125,6 @@ async def list_founded_values(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(
     LWTStates.select_result,
-    F.data == const.KEY_NEW_SEARCH
-)
-async def new_search(callback: CallbackQuery, state: FSMContext):
-    if callback.data is None:
-        raise AiogramError("No callback data")
-
-    if callback.message is None:
-        raise AiogramError("No callback message")
-
-    await callback.message.delete_reply_markup()
-
-    await state.set_state(LWTStates.adding_media)
-    await callback.message.reply(
-        text="Что требуется найти?",
-        reply_markup=lwt_kb.inl_back_to_home_state_keyboard()
-    )
-
-
-@router.callback_query(
-    LWTStates.select_result,
     F.data.startswith(const.PRE_KEY_SELECTED)
 )
 async def select_found_value(callback: CallbackQuery, state: FSMContext):
