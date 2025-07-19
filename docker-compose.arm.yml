@@ -2,12 +2,11 @@ version: '3.8'
 
 services:
   lwt_bot:
+    platform: linux/arm64
     build: .
     container_name: lwt_bot
     volumes:
       - .:/home/appuser/app
-    env_file:
-      - .env
     depends_on:
       lwt_db:
         condition: service_healthy
@@ -17,10 +16,9 @@ services:
     restart: unless-stopped
 
   lwt_db:
+    platform: linux/arm64
     image: postgres:16
     container_name: lwt_db
-    env_file:
-      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
@@ -33,6 +31,7 @@ services:
     restart: unless-stopped
 
   lwt_redis:
+    platform: linux/arm64
     image: redis:7-alpine
     container_name: lwt_redis
     restart: unless-stopped
