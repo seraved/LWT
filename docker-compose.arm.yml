@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: lwt_bot
+    volumes:
+      - .:/home/appuser/app
     env_file:
       - stack.env
     depends_on:
