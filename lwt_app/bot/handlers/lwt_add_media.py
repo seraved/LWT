@@ -125,7 +125,7 @@ async def list_founded_values(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(
     LWTStates.select_result,
-    F.data.startswith(const.KEY_NEW_SEARCH)
+    F.data == const.KEY_NEW_SEARCH
 )
 async def new_search(callback: CallbackQuery, state: FSMContext):
     if callback.data is None:

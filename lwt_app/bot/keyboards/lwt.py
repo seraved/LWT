@@ -61,7 +61,7 @@ def inl_found_content_pagination(
             pagination,
             [InlineKeyboardButton(
                 text=const.NEW_SEARCH,
-                callback_data=f"{const.PRE_KEY_SELECTED}{page}"
+                callback_data=f"{const.KEY_NEW_SEARCH}"
             )],
         ]
     )
