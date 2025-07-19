@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   lwt_bot:
     platform: linux/arm64
@@ -17,7 +15,7 @@ services:
 
   lwt_db:
     platform: linux/arm64
-    image: postgres:16
+    image: postgres:13-alpine
     container_name: lwt_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -32,7 +30,7 @@ services:
 
   lwt_redis:
     platform: linux/arm64
-    image: redis:7-alpine
+    image: redis:6-alpine
     container_name: lwt_redis
     restart: unless-stopped
     ports:
