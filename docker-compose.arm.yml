@@ -8,9 +8,11 @@ services:
     env_file:
       - stack.env
     depends_on:
+      lwt_db:
+        condition: service_healthy
       lwt_redis:
         condition: service_healthy
-    entrypoint: /home/appuser/app/entrypoint.sh
+    entrypoint: ./entrypoint.sh
     restart: unless-stopped
 
   lwt_redis:
