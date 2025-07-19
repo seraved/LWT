@@ -6,25 +6,11 @@ services:
     volumes:
       - .:/home/appuser/app
     depends_on:
-      lwt_db:
+      lwt_redis:
         condition: service_healthy
     entrypoint: /home/appuser/app/entrypoint.sh
     restart: unless-stopped
 
-  lwt_db:
-    platform: linux/arm64
-    image: postgres:13-alpine
-    container_name: lwt_db
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
 
   lwt_redis:
     platform: linux/arm64
@@ -43,6 +29,21 @@ services:
     depends_on:
       lwt_db:
         condition: service_healthy
+
+  lwt_db:
+    platform: linux/arm64
+    image: postgres:13-alpine
+    container_name: lwt_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   postgres_data:
