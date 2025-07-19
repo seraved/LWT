@@ -11,6 +11,8 @@ services:
     depends_on:
       lwt_db:
         condition: service_healthy
+      lwt_redis:
+        condition: service_healthy
     entrypoint: /home/appuser/app/entrypoint.sh
     restart: unless-stopped
 
@@ -30,5 +32,20 @@ services:
       retries: 5
     restart: unless-stopped
 
+  lwt_redis:
+    image: redis:7-alpine
+    container_name: lwt_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
 volumes:
   postgres_data:
+  redis_data:
