@@ -5,18 +5,21 @@ services:
     container_name: lwt_bot
     volumes:
       - .:/home/appuser/app
+    env_file:
+      - stack.env
     depends_on:
       lwt_redis:
         condition: service_healthy
     entrypoint: /home/appuser/app/entrypoint.sh
     restart: unless-stopped
 
-
   lwt_redis:
     platform: linux/arm64
     image: redis:6-alpine
     container_name: lwt_redis
     restart: unless-stopped
+    env_file:
+      - stack.env
     ports:
       - "6379:6379"
     volumes:
@@ -36,6 +39,8 @@ services:
     container_name: lwt_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - stack.env
     ports:
       - "5432:5432"
     healthcheck:
