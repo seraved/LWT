@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  lwt_bot:
+    platform: linux/arm64
+    build: .
+    container_name: lwt_bot
+    volumes:
+      - .:/home/appuser/app
+    depends_on:
+      lwt_db:
+        condition: service_healthy
+      lwt_redis:
+        condition: service_healthy
+    entrypoint: /home/appuser/app/entrypoint.sh
+    restart: unless-stopped
+
+  lwt_db:
+    platform: linux/arm64
+    image: postgres:16
+    container_name: lwt_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  lwt_redis:
+    platform: linux/arm64
+    image: redis:7-alpine
+    container_name: lwt_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data:
