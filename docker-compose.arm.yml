@@ -10,7 +10,7 @@ services:
     depends_on:
       lwt_redis:
         condition: service_healthy
-    entrypoint: ./entrypoint.sh
+    entrypoint: alembic upgrade head && python ./lwt_app/main.py
     restart: unless-stopped
 
   lwt_redis:
