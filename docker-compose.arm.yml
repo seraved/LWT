@@ -1,10 +1,12 @@
 services:
   lwt_bot:
     platform: linux/arm64
-    build: .
+    build:
+      context: ${HOST_ROOT}
+      dockerfile: Dockerfile
     container_name: lwt_bot
     volumes:
-      - .:/home/appuser/app
+      - ${HOST_ROOT}:/home/appuser/app
     env_file:
       - stack.env
     depends_on:
@@ -12,8 +14,7 @@ services:
         condition: service_healthy
       lwt_redis:
         condition: service_healthy
-    # entrypoint: /home/appuser/app/entrypoint.sh
-    command: ["tail", "-f", "/dev/null"]
+    entrypoint: /home/appuser/app/entrypoint.sh
     restart: unless-stopped
 
   lwt_redis:
