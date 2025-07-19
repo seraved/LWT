@@ -44,5 +44,5 @@ COPY --chown=appuser:appgroup . .
 # Переключаемся на непривилегированного пользователя
 USER appuser
 
-# Команда для запуска приложения
-CMD ["python", "./lwt_app/main.py"]
+# # Команда для запуска приложения
+# CMD ["python", "./lwt_app/main.py"]
