@@ -41,6 +41,9 @@ COPY --from=builder /install /usr/local
 # Копируем исходный код приложения и устанавливаем правильного владельца
 COPY --chown=appuser:appgroup . .
 
+# Устанавливаем права на выполнение для entrypoint скрипта
+RUN chmod +x ./entrypoint.sh
+
 # Переключаемся на непривилегированного пользователя
 USER appuser
 
