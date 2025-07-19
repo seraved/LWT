@@ -66,9 +66,10 @@ async def message_answer_founded_media(
         )
 
 
-async def callback_message_edit_founded_media(
+async def callback_message_edit_media(
     message: MaybeInaccessibleMessageUnion,
-    found_content: FoundMediaContent,
+    content: FoundMediaContent | MediaDTO,
+    status: str | None = None,
     page: int = 1,
     total_pages: int = 1,
     reply_markup: InlineKeyboardMarkup | None = None
@@ -76,16 +77,17 @@ async def callback_message_edit_founded_media(
     try:
         await message.edit_media(
             media=content_media_builder(
-                content=found_content,
-                status=f"{page +1} / {total_pages}"
+                content=content,
+                status=status or f"{page +1} / {total_pages}"
             ),
             reply_markup=reply_markup,
         )
     except Exception as e:
         await message.edit_media(
             media=content_media_builder(
-                content=found_content,
-                status=f"{page +1} / {total_pages}"
+                content=content,
+                status=status or f"{page +1} / {total_pages}",
+                use_local_media=True,
             ),
             reply_markup=reply_markup,
         )

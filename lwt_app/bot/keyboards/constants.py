@@ -7,6 +7,8 @@ DELETE_TEXT = "❌ Удалить"
 CONFIRM_DELETE_TEXT = "✅ Подтвердить удаление"
 CHECK_APP_AGAIN_TEXT = "🔄 Проверить статус заявки"
 BACK_TEXT = "↩️ Назад"
+NEW_SEARCH = "🆕 Новый поиск"
+
 
 ADDED_TEXT = "✅ Добавлено"
 
@@ -33,6 +35,8 @@ KEY_ALL = "all__"
 KEY_IS_WATCHED = "is_watched__"
 KEY_IS_UNWATCHED = "is_unwatched__"
 
+KEY_NEW_SEARCH = "new_search__"
+
 KEY_APPLY_FILTER = "apply_filter__"
 KEY_TO_HONE_TYPE = "to_home_menu__"
 
@@ -42,6 +46,7 @@ PRE_KEY_DELETE_CONFIRM = "delete_confirm__"
 
 KEY_RETURN_TO_SELECTION = "main_menu__"
 KEY_CHECK_APP_TEXT = "check_approval__"
+
 
 PRE_KEY_SELECTED = "selected__"
 PRE_KEY_PAGE = "content_page__"

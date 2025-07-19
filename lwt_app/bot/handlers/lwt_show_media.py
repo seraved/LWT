@@ -11,7 +11,7 @@ from services.media import MediaService
 from utils.logs import logger
 from utils.mapper import key_to_media_type, key_to_text
 
-from .common import content_media_builder, get_statistic_msg
+from .common import get_statistic_msg, callback_message_edit_media
 
 router = Router()
 
@@ -118,11 +118,11 @@ async def show_content(callback: CallbackQuery, state: FSMContext):
         )
         return
     content, *_ = result
-    await callback.message.edit_media(
-        media=content_media_builder(
-            content=content,
-            status=f"1 / {total}"
-        ),
+    await callback_message_edit_media(
+        message=callback.message,
+        content=content,
+        page=0,
+        total_pages=total,
         reply_markup=lwt_kb.inl_show_content_pagination(
             page=0,
             total_pages=total,
@@ -159,12 +159,11 @@ async def list_content(callback: CallbackQuery, state: FSMContext):
         page=page+1,
         per_page=1,
     )
-
-    await callback.message.edit_media(
-        media=content_media_builder(
-            content=content,
-            status=f"{page+1} / {total}"
-        ),
+    await callback_message_edit_media(
+        message=callback.message,
+        content=content,
+        page=page,
+        total_pages=total,
         reply_markup=lwt_kb.inl_show_content_pagination(
             page=page,
             total_pages=total,
@@ -205,15 +204,15 @@ async def set_watched_unwatched(callback: CallbackQuery, state: FSMContext):
     if content is None:
         raise AiogramError("No content after change watched flag")
 
-    await callback.message.edit_media(
-        media=content_media_builder(
-            content=content,
-            status=f"{page+1} / {total}"
-        ),
+    await callback_message_edit_media(
+        message=callback.message,
+        content=content,
+        page=page+1,
+        total_pages=total,
         reply_markup=lwt_kb.inl_show_content_pagination(
             page=page,
             total_pages=total,
-            content=content
+            content=content,
         )
     )
 
@@ -264,7 +263,6 @@ async def del_content(callback: CallbackQuery, state: FSMContext):
         user_id=user_id,
         media_type=media_type,
     )
-    await state.set_data(data={"show_filter": {}})
     await callback.message.edit_caption(
         caption="Удалено!",
         reply_markup=lwt_kb.inl_after_del_first_page() if total else None,

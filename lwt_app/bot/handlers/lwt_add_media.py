@@ -13,9 +13,8 @@ from services.user import UserService
 from utils.logs import logger
 
 from .common import (
-    content_media_builder,
     message_answer_founded_media,
-    callback_message_edit_founded_media,
+    callback_message_edit_media,
     get_statistic_msg,
 )
 
@@ -111,9 +110,9 @@ async def list_founded_values(callback: CallbackQuery, state: FSMContext):
 
     page = int(callback.data.split("__")[1])
     # TODO feat: кнопка Вернуться и поискать другое
-    await callback_message_edit_founded_media(
+    await callback_message_edit_media(
         message=callback.message,
-        found_content=found_content[page],
+        content=found_content[page],
         page=page,
         total_pages=len(found_content),
         reply_markup=lwt_kb.inl_found_content_pagination(
@@ -122,6 +121,26 @@ async def list_founded_values(callback: CallbackQuery, state: FSMContext):
         )
     )
     await callback.answer()
+
+
+@router.callback_query(
+    LWTStates.select_result,
+    F.data.startswith(const.KEY_NEW_SEARCH)
+)
+async def new_search(callback: CallbackQuery, state: FSMContext):
+    if callback.data is None:
+        raise AiogramError("No callback data")
+
+    if callback.message is None:
+        raise AiogramError("No callback message")
+
+    await callback.message.delete_reply_markup()
+
+    await state.set_state(LWTStates.adding_media)
+    await callback.message.reply(
+        text="Что требуется найти?",
+        reply_markup=lwt_kb.inl_back_to_home_state_keyboard()
+    )
 
 
 @router.callback_query(
@@ -153,12 +172,13 @@ async def select_found_value(callback: CallbackQuery, state: FSMContext):
         media_content=NewMediaDTO.from_found_content(content)
     )
     await callback.message.delete_reply_markup()
-    await callback.message.edit_media(
-        media=content_media_builder(
-            content=content,
-            status=const.ADDED_TEXT,
-        ),
+
+    await callback_message_edit_media(
+        message=callback.message,
+        content=content,
+        status=const.ADDED_TEXT,
     )
+
     await state.update_data(data={"found_content": None})
     found_content = await state.get_value("found_content")
     # TODO feat: Добавить сообщение о успехе и открыть клавиатуру (например сколько фильмов добавлено\просмотрено)
