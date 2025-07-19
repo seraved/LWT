@@ -8,8 +8,8 @@ services:
     depends_on:
       lwt_db:
         condition: service_healthy
-      lwt_redis:
-        condition: service_healthy
+      # lwt_redis:
+      #   condition: service_healthy
     entrypoint: /home/appuser/app/entrypoint.sh
     restart: unless-stopped
 
@@ -45,4 +45,4 @@ services:
 
 volumes:
   postgres_data:
-  redis_data:
+  # redis_data:
